@@ -26,6 +26,8 @@ try {
   const paths = packed.files.map(file => file.path);
   assert(paths.includes('dist/index.js'));
   assert(paths.includes('dist/mcp/server.js'));
+  assert(paths.includes('dist/mcp/index.js'));
+  assert(paths.includes('dist/mcp/index.d.ts'));
   assert(paths.includes('schemas/request.json'));
   assert(paths.includes('skills/jev/SKILL.md'));
   assert(paths.every(path => !path.startsWith('examples/')), 'Repository examples must not be distributed');
@@ -50,6 +52,26 @@ try {
   const description = JSON.parse((await cli(['describe'])).stdout);
   assert.equal(description.commands.length, 11);
   assert.equal(JSON.parse((await cli(['schema', 'request'])).stdout).type, 'object');
+  // Resolve the public ESM entry point from a fresh install, without invoking
+  // the executable or relying on source/deep imports.
+  await exec(process.execPath, ['--input-type=module', '--eval', `
+    import assert from 'node:assert/strict';
+    import { createJevMcpServerFactory } from '@gnapse/jev/mcp';
+    import { createMcpHandler } from '@modelcontextprotocol/server';
+    import schema from '@gnapse/jev/schemas/request.json' with { type: 'json' };
+    assert.equal(schema.type, 'object');
+    const handler = createMcpHandler(createJevMcpServerFactory());
+    try {
+      const response = await handler.fetch(new Request('http://localhost/mcp', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream', 'mcp-protocol-version': '2025-11-25' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }),
+      }));
+      assert.equal(response.status, 200);
+      const body = await response.text();
+      for (const name of ['jev_ask', 'jev_batch', 'jev_models', 'jev_validate']) assert(body.includes(name));
+    } finally { await handler.close(); }
+  `], { cwd: install, env, maxBuffer: 2 * 1024 * 1024 });
   // Supply fixtures from the repository to the independently installed CLI.
   const examples = join(root, 'examples');
   const example = join(examples, 'triage.request.json');

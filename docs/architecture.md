@@ -57,8 +57,14 @@ work without shutting down the server or cancelling another call. Server shutdow
 cancels all outstanding work. One shared limiter bounds concurrent API requests
 across calls. Batch size, pending calls, and input bytes also have finite limits;
 oversized batches are rejected before inference. Discovery and validation work
-without an API key. Remote HTTP hosting and public library exports are outside
-the initial interface.
+without an API key.
+
+`@gnapse/jev/mcp` exports `createJevMcpServerFactory` for embedding the same tools
+in another process. The factory captures one shared service and produces fresh
+protocol servers for the host's transport. Configuration and credentials are
+explicit; this entry point never starts the CLI, reads environment variables or
+files, or installs process signal handlers. The host owns HTTP routing, access
+control, transport body limits, and shutdown. The internal core stays private.
 
 ## Verification and release
 
