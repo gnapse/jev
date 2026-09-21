@@ -46,7 +46,8 @@
     "test:package": "npm run build && node scripts/package-smoke.mjs",
     "check": "npm run type-check && npm test && npm run test:package",
     "prepack": "npm run build",
-    "prepublishOnly": "npm run check"
+    "prepublishOnly": "npm run check",
+    "release": "semantic-release"
   },
   "keywords": [
     "jev",
@@ -72,6 +73,8 @@
   "devDependencies": {
     "@modelcontextprotocol/client": "2.0.0",
     "@types/node": "^22.0.0",
+    "conventional-changelog-conventionalcommits": "9.3.1",
+    "semantic-release": "25.0.9",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1"
   }
