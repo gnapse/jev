@@ -1,0 +1,37 @@
+{
+  "model": "jev-1.13.0",
+  "state": {
+    "message": "I cannot sign in, so I cannot finish the report due this afternoon. Please help."
+  },
+  "questions": {
+    "team": {
+      "type": "choice",
+      "instructions": "Which team can best address the request in `message`?",
+      "criteria": {
+        "billing": {
+          "handles": ["charges", "payment methods", "subscription renewals"],
+          "excludes": ["sign-in failures"]
+        },
+        "support": "Product errors, access problems, and troubleshooting",
+        "other": "The request does not fit either team's scope"
+      }
+    },
+    "urgent": {
+      "type": "noul",
+      "instructions": "Does `message` request action before an explicit near-term deadline?",
+      "criteria": {
+        "true": "The sender states a deadline today or within the next day",
+        "false": "No such deadline is stated"
+      }
+    },
+    "impact": {
+      "type": "score",
+      "instructions": "How much does the problem described in `message` disrupt the sender's work?",
+      "criteria": [
+        "The message describes no disruption to work",
+        "The message describes disruption but work can continue with a workaround",
+        "The message states that work cannot continue"
+      ]
+    }
+  }
+}

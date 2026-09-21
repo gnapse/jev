@@ -1,0 +1,22 @@
+{
+  "rename-option": {
+    "public_interface": true,
+    "persistent_data": false,
+    "documentation": true
+  },
+  "database-and-docs": {
+    "public_interface": false,
+    "persistent_data": true,
+    "documentation": true
+  },
+  "docs-only": {
+    "public_interface": false,
+    "persistent_data": false,
+    "documentation": true
+  },
+  "internal-refactor": {
+    "public_interface": false,
+    "persistent_data": false,
+    "documentation": false
+  }
+}

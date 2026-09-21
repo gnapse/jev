@@ -1,0 +1,34 @@
+[
+  {
+    "id": "explicit-destination",
+    "document": "From: Morgan <morgan@example.com>\nTo: billing@example.com\nPlease send my receipt to receipts+travel@example.com. Use billing@example.com only for payment questions.",
+    "expected": {
+      "status": "selected",
+      "email": "receipts+travel@example.com"
+    }
+  },
+  {
+    "id": "unrelated-address",
+    "document": "Contact help@example.com for product support. I do not need a receipt.",
+    "expected": {
+      "status": "not_found",
+      "email": null
+    }
+  },
+  {
+    "id": "ambiguous-destination",
+    "document": "I need a receipt by email. My two addresses are home@example.com and work@example.com, but I have not decided which one should receive it.",
+    "expected": {
+      "status": "review",
+      "email": null
+    }
+  },
+  {
+    "id": "no-candidate",
+    "document": "Please send my receipt to the postal address on the order.",
+    "expected": {
+      "status": "not_found",
+      "email": null
+    }
+  }
+]

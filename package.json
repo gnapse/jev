@@ -1,0 +1,70 @@
+{
+  "name": "@gnapse/jev",
+  "version": "0.1.0",
+  "description": "CLI and MCP server for TypeSafe's Jev model, built for scripts, agents, and automation.",
+  "author": "Ernesto García",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnapse/jev.git"
+  },
+  "homepage": "https://github.com/gnapse/jev#readme",
+  "bugs": {
+    "url": "https://github.com/gnapse/jev/issues"
+  },
+  "type": "module",
+  "bin": {
+    "jev": "dist/index.js"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "skills",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "docs"
+  ],
+  "scripts": {
+    "build": "node scripts/clean.mjs && tsc -p tsconfig.build.json && node scripts/build.mjs",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "type-check": "tsc --noEmit",
+    "typecheck": "npm run type-check",
+    "test": "vitest run",
+    "test:live": "npm run build && node scripts/live-smoke.mjs",
+    "examples:live": "npm run build && node --env-file-if-exists=.env examples/run.mjs all --check",
+    "test:package": "npm run build && node scripts/package-smoke.mjs",
+    "check": "npm run type-check && npm test && npm run test:package",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run check"
+  },
+  "keywords": [
+    "jev",
+    "typesafe",
+    "ai",
+    "cli",
+    "automation",
+    "classification",
+    "agent-skills",
+    "mcp"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.0.0",
+    "@typesafe-ai/sdk": "0.6.0",
+    "ajv": "^8.20.0",
+    "commander": "^15.0.0",
+    "jsonc-parser": "^3.3.1"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.0.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  }
+}

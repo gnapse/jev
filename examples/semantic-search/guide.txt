@@ -1,0 +1,6 @@
+Acme CLI input guide
+
+Pass --state-file input.json --state-format json to parse a UTF-8 file as JSON state.
+Without --state-format json, --state-file reads the file as literal text.
+The --state option always accepts literal text.
+To read JSON from stdin, pass --state-file - --state-format json.

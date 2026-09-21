@@ -1,0 +1,17 @@
+{
+  "matching-scope": {
+    "relation": "supported"
+  },
+  "explicit-failure": {
+    "relation": "contradicted"
+  },
+  "unrun-platforms": {
+    "relation": "insufficient"
+  },
+  "plan-only": {
+    "relation": "contradicted"
+  },
+  "unmeasured-speedup": {
+    "relation": "insufficient"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "direct-answer": {
+    "relevance": {
+      "min": 2.5,
+      "max": 3
+    },
+    "answers_query": true
+  },
+  "partial-answer": {
+    "relevance": {
+      "min": 1,
+      "max": 2.5
+    },
+    "answers_query": false
+  },
+  "same-topic": {
+    "relevance": {
+      "min": 0.5,
+      "max": 1.75
+    },
+    "answers_query": false
+  },
+  "wrong-direction": {
+    "relevance": {
+      "min": 0,
+      "max": 1.25
+    },
+    "answers_query": false
+  },
+  "no-answer": {
+    "answers_query": false
+  }
+}

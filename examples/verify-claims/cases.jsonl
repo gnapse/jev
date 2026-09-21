@@ -1,0 +1,5 @@
+{"id": "matching-scope", "state": {"claim": "The parser unit test suite passed on macOS.", "evidence": "Runner: macOS 15. Command: npm run test:parser. Test Files: 1 passed (1). Tests: 12 passed (12). Exit code: 0."}}
+{"id": "explicit-failure", "state": {"claim": "The parser unit test suite passed.", "evidence": "Command: npm run test:parser. Test Files: 1 failed (1). Tests: 1 failed, 11 passed. Exit code: 1."}}
+{"id": "unrun-platforms", "state": {"claim": "The package tests passed on Linux, macOS, and Windows.", "evidence": "Runner: macOS 15. Command: npm test. Tests: 12 passed (12). Exit code: 0. No Linux or Windows run is included."}}
+{"id": "plan-only", "state": {"claim": "The database migration completed successfully.", "evidence": "Next step: run npm run migrate against the staging database. This command has not been executed yet."}}
+{"id": "unmeasured-speedup", "state": {"claim": "The new parser is twice as fast as the previous parser.", "evidence": "The diff replaces the parser with a new implementation. Unit tests pass. No benchmark results were recorded."}}

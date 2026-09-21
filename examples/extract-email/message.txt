@@ -1,0 +1,3 @@
+From: Morgan <morgan@example.com>
+To: billing@example.com
+Please send my receipt to receipts+travel@example.com. Use billing@example.com only for payment questions.

@@ -1,0 +1,26 @@
+{
+  "download-timeout": {
+    "cause": "network",
+    "transient": true
+  },
+  "dependency-conflict": {
+    "cause": "dependencies",
+    "transient": false
+  },
+  "type-error": {
+    "cause": "compile",
+    "transient": false
+  },
+  "failed-assertion": {
+    "cause": "assertion",
+    "transient": false
+  },
+  "warning-only": {
+    "cause": "no_failure",
+    "transient": false
+  },
+  "missing-output": {
+    "cause": "unknown",
+    "transient": false
+  }
+}

@@ -1,0 +1,6 @@
+{"id": "download-timeout", "state": {"log": "$ npm ci\nnpm error code ETIMEDOUT\nnpm error network request to https://registry.npmjs.org/example failed: connect ETIMEDOUT\nProcess exited with code 1."}}
+{"id": "dependency-conflict", "state": {"log": "$ npm ci\nnpm error ERESOLVE unable to resolve dependency tree\nFound: react@19.0.0\nCould not resolve dependency: peer react@^18.0.0 from example-widget@1.0.0\nProcess exited with code 1."}}
+{"id": "type-error", "state": {"log": "$ tsc --noEmit\nsrc/parser.ts(12,3): error TS2322: Type 'string' is not assignable to type 'number'.\nProcess exited with code 2."}}
+{"id": "failed-assertion", "state": {"log": "$ vitest run\nFAIL test/parser.test.ts > keeps duplicate values\nAssertionError: expected [1] to deeply equal [1, 1]\nTests: 1 failed, 8 passed\nProcess exited with code 1."}}
+{"id": "warning-only", "state": {"log": "$ npm test\nWarning: the legacy config format is deprecated.\nTest Files: 4 passed (4)\nTests: 24 passed (24)\nProcess exited with code 0."}}
+{"id": "missing-output", "state": {"log": "Job failed. Process exited with code 1. No step output was captured."}}

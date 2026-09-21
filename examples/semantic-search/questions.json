@@ -1,0 +1,16 @@
+{
+  "relevance": {
+    "type": "score",
+    "instructions": "How directly does `candidate.text` answer `query`? Judge the content provided, not the filename. Do not assume omitted instructions or implementation details.",
+    "criteria": [
+      "The passage does not help answer the query",
+      "The passage is on the same topic but does not provide a usable answer",
+      "The passage provides part of the answer but leaves a required step or condition unexplained",
+      "The passage provides a direct, usable answer to the whole query"
+    ]
+  },
+  "answers_query": {
+    "type": "noul",
+    "instructions": "Does `candidate.text` contain enough information to answer `query` without inventing a missing step?"
+  }
+}
