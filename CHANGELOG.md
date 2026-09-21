@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Export `createJevMcpServerFactory` and its configuration types from `@gnapse/jev/mcp`
+  for hosts that provide their own transport, credentials, and lifecycle.
+- Share API concurrency and outstanding-call limits across servers from one factory.
+
 ## 0.1.1
 
 - `jev auth login`, `status`, and `logout` manage a user-level API key shared by CLI and MCP.

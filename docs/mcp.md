@@ -115,3 +115,54 @@ Unknown tools and malformed protocol requests use MCP protocol errors.
 
 A batch containing record failures still returns its result envelope; inspect
 the record errors and summary even when `isError` is absent.
+
+## Hosting and embedding
+
+The ESM entry point `@gnapse/jev/mcp` exports `createJevMcpServerFactory`,
+`JevMcpOptions`, and `JevMcpConfig`. It does not start a server or the CLI, read
+environment variables or files, or register process signal handlers.
+
+Create the factory once per account/workload, outside request handlers:
+
+```ts
+import { createJevMcpServerFactory } from '@gnapse/jev/mcp';
+import { createMcpHandler } from '@modelcontextprotocol/server';
+
+const shutdown = new AbortController();
+const factory = createJevMcpServerFactory({
+  apiKey: secretFromYourHost,
+  config: { concurrency: 4, deadline_ms: 120_000 },
+  signal: shutdown.signal,
+});
+const handler = createMcpHandler(factory);
+// Mount handler.fetch at /mcp using your framework or the SDK's Node adapter.
+// On shutdown, abort the shared work and close the transport:
+// shutdown.abort();
+// await handler.close();
+```
+
+Use MCP TypeScript SDK 2.x with this factory. Each factory invocation returns a
+fresh low-level SDK `Server`, suitable for `createMcpHandler` or `serveStdio`.
+All servers from a factory share one API client, concurrency limiter, and
+outstanding-call count. Separate factories have separate limits. Multiple
+processes also have independent limits; these are not account-wide quotas.
+
+`apiKey` is optional for discovery and validation. API tools return `AUTH_ERROR`
+without it, even if the process has `TYPESAFE_API_KEY` set. The optional `config`
+uses the [JSON configuration fields](cli.md#configuration), including `base_url`,
+`model`, `timeout_ms`, `deadline_ms`, `concurrency`, `max_input_bytes`, `headers`,
+and `retry`. It is validated when the factory is created. `config.model` is a
+default; a tool request's `model` takes precedence. Configuration is captured at
+creation; create a new factory to rotate credentials or change limits.
+
+Pass a host-owned `signal` to cancel all work on shutdown. Closing one protocol
+server does not shut down its siblings. Request cancellation affects only that
+request. An optional `log` callback receives sanitized diagnostics and is silent
+by default; it should not throw.
+
+The host owns the listener, HTTPS, access control, Host/Origin validation, and
+graceful transport shutdown. `max_input_bytes` bounds decoded tool arguments;
+the host must also bound HTTP request bodies before parsing them. This package
+does not implement OAuth or HTTP routing. The remaining `dist/` modules are
+private; use this entry point rather than deep imports. Published JSON schemas
+remain accessible through `@gnapse/jev/schemas/<name>.json`.

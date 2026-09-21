@@ -12,6 +12,14 @@
     "url": "https://github.com/gnapse/jev/issues"
   },
   "type": "module",
+  "exports": {
+    "./mcp": {
+      "types": "./dist/mcp/index.d.ts",
+      "import": "./dist/mcp/index.js"
+    },
+    "./schemas/*": "./schemas/*",
+    "./package.json": "./package.json"
+  },
   "bin": {
     "jev": "dist/index.js"
   },

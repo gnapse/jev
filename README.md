@@ -151,6 +151,10 @@ interfaces share validation, API behavior, and complete structured results.
 See the [MCP reference](docs/mcp.md) for arguments, limits, cancellation, and
 errors. Use the CLI for large JSONL streams; MCP batches accept up to 100 records.
 
+To embed these tools in a hosted MCP service, import `createJevMcpServerFactory`
+from `@gnapse/jev/mcp`. See [hosting and embedding](docs/mcp.md#hosting-and-embedding)
+for the explicit configuration and lifecycle contract.
+
 ## Agent skill
 
 The npm package includes an [Agent Skills](https://agentskills.io/specification)
