@@ -57,19 +57,29 @@ const config = object({ model: nonempty, base_url: nonempty, timeout_ms: positiv
     httpStatuses: { type: 'array', uniqueItems: true,
       items: { type: 'integer', minimum: 100, maximum: 599 } } }, []) }, []);
 const batchBase = { line: positive, id: { type: ['string', 'null'] } };
-const description = object({ cli_version: nonempty, contract_version: positive,
-  commands: { type: 'array', items: object({ name: nonempty, description: string,
+const commandDescription = object({ name: nonempty, description: string,
     arguments: { type: 'array', items: string }, flags: { type: 'array', items:
       object({ flags: string, description: string }, ['flags', 'description']) },
     input_schemas: { type: 'array', items: string }, output_schema: string,
-    network: { type: 'boolean' }, stdin: string },
-  ['name', 'description', 'arguments', 'flags', 'input_schemas', 'output_schema']) },
+    network: { type: 'boolean' }, stdin: string,
+    subcommands: { type: 'array', items: { $ref: '#/$defs/command' } } },
+  ['name', 'description', 'arguments', 'flags', 'input_schemas', 'output_schema']);
+const description = { ...object({ cli_version: nonempty, contract_version: positive,
+  commands: { type: 'array', items: { $ref: '#/$defs/command' } },
   stdin_rules: { type: 'array', items: string }, environment: map(string), exit_codes: map(string),
   schema_names: { type: 'array', items: string } },
-['cli_version', 'contract_version', 'commands', 'stdin_rules', 'environment', 'exit_codes', 'schema_names']);
+['cli_version', 'contract_version', 'commands', 'stdin_rules', 'environment', 'exit_codes', 'schema_names']),
+  $defs: { command: commandDescription } };
+
+const authSource = { enum: ['environment', 'file', 'none'] };
 
 const definitions: Record<string, Schema> = {
   request: requestSchema(), questions: questionsSchema(), response, config, error, description,
+  'auth-status': object({ configured: { type: 'boolean' }, source: authSource, path: nonempty }, ['configured', 'source', 'path']),
+  'auth-login': object({ saved: { const: true }, verified: { const: true }, source: { enum: ['environment', 'file'] }, path: nonempty },
+    ['saved', 'verified', 'source', 'path']),
+  'auth-logout': object({ removed: { type: 'boolean' }, configured: { type: 'boolean' }, source: { enum: ['environment', 'none'] }, path: nonempty },
+    ['removed', 'configured', 'source', 'path']),
   validation: object({ valid: { const: true }, warnings: { type: 'array', items: string } }, ['valid', 'warnings']),
   'json-schema': { type: 'object' },
   models: object({ models: { type: 'array', items: object({ name: nonempty,

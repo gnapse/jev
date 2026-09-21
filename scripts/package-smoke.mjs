@@ -16,6 +16,9 @@ assert(npmPath, 'Run this script through npm run test:package.');
 const runNpm = (args, cwd = root) => exec(process.execPath, [npmPath, ...args], { cwd, maxBuffer: 2 * 1024 * 1024 });
 const env = { ...process.env };
 for (const key of ['TYPESAFE_API_KEY', 'TYPESAFE_BASE_URL', 'TYPESAFE_DEFAULT_MODEL', 'TYPESAFE_LOG_LEVEL']) delete env[key];
+// Tests must never read or replace the developer's saved credentials.
+env.XDG_CONFIG_HOME = join(temp, 'config');
+env.APPDATA = join(temp, 'config');
 let server;
 
 try {
@@ -37,11 +40,15 @@ try {
   const executable = join(install, 'node_modules', ...packed.name.split('/'), 'dist', 'index.js');
   const installedSkill = join(install, 'node_modules', ...packed.name.split('/'), 'skills', 'jev', 'SKILL.md');
   assert.equal(await readFile(installedSkill, 'utf8'), await readFile(join(root, 'skills', 'jev', 'SKILL.md'), 'utf8'));
-  const cli = (args, extraEnv = {}) => exec(process.execPath, [executable, ...args], { cwd: install, env: { ...env, ...extraEnv }, maxBuffer: 2 * 1024 * 1024 });
+  const cli = (args, extraEnv = {}, input) => {
+    const pending = exec(process.execPath, [executable, ...args], { cwd: install, env: { ...env, ...extraEnv }, maxBuffer: 2 * 1024 * 1024 });
+    if (input !== undefined) pending.child.stdin.end(input);
+    return pending;
+  };
   assert.equal((await cli(['--version'])).stdout.trim(), packed.version);
   assert.equal((await runNpm(['exec', '--offline', '--prefix', install, '--', 'jev', '--version'], install)).stdout.trim(), packed.version);
   const description = JSON.parse((await cli(['describe'])).stdout);
-  assert.equal(description.commands.length, 10);
+  assert.equal(description.commands.length, 11);
   assert.equal(JSON.parse((await cli(['schema', 'request'])).stdout).type, 'object');
   // Supply fixtures from the repository to the independently installed CLI.
   const examples = join(root, 'examples');
@@ -104,6 +111,19 @@ try {
   await verifyMcp(executable, { cwd: install, env: { ...env, ...apiEnv }, mode: { pin: '2026-07-28' } });
   assert.equal(calls, 38);
   await verifyMcp(executable, { cwd: install, env, offline: true });
+  assert.equal(JSON.parse((await cli(['auth', 'status'])).stdout).configured, false);
+  const loggedIn = await cli(['auth', 'login', '--stdin'], { ...apiEnv, TYPESAFE_API_KEY: 'overridden-key' }, 'package-test-key\n');
+  assert.equal(JSON.parse(loggedIn.stdout).saved, true);
+  assert(!(loggedIn.stdout + loggedIn.stderr).includes('package-test-key'));
+  const savedEnv = { TYPESAFE_BASE_URL: apiEnv.TYPESAFE_BASE_URL };
+  assert.equal(JSON.parse((await cli(['auth', 'status'])).stdout).source, 'file');
+  assert.equal(JSON.parse((await cli(['models'], savedEnv)).stdout).models.length, 1);
+  await verifyMcp(executable, { cwd: install, env: { ...env, ...savedEnv } });
+  await verifyMcp(executable, { cwd: install, env: { ...env, ...savedEnv }, mode: { pin: '2026-07-28' } });
+  assert.equal(calls, 48);
+  assert.equal(JSON.parse((await cli(['auth', 'logout'])).stdout).removed, true);
+  await assert.rejects(cli(['models'], savedEnv), error => error.code === 3 && JSON.parse(error.stderr).error.code === 'AUTH_ERROR');
+  assert.equal(JSON.parse((await cli(['models'], apiEnv)).stdout).models.length, 1);
   // A client may close stdin without an MCP handshake. The server must exit.
   await new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [executable, 'mcp'], { cwd: install, env, stdio: ['pipe', 'pipe', 'pipe'] });

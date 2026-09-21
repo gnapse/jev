@@ -13,6 +13,7 @@ import { registerValidateCommand } from './commands/validate.js';
 import { registerSchemaCommand } from './commands/schema.js';
 import { registerDescribeCommand } from './commands/describe.js';
 import { registerMcpCommand } from './commands/mcp.js';
+import { registerAuthCommand } from './commands/auth.js';
 
 export function createProgram(context: Context): Command {
   const program = new Command().name('jev').description('Typed AI judgments for scripts, agents, and automation')
@@ -29,7 +30,7 @@ export function createProgram(context: Context): Command {
     });
   for (const register of [registerAskCommand, registerChoiceCommand, registerNoulCommand,
     registerScoreCommand, registerBatchCommand, registerModelsCommand, registerValidateCommand,
-    registerSchemaCommand, registerDescribeCommand, registerMcpCommand]) register(program, context);
+    registerSchemaCommand, registerDescribeCommand, registerMcpCommand, registerAuthCommand]) register(program, context);
   program.action(() => { program.help(); });
   return program;
 }

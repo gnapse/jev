@@ -26,7 +26,7 @@ describe('process contract and discovery', () => {
     expect(result.code).toBe(0);
     const data = JSON.parse(result.out);
     validate('description', data);
-    expect(data.commands.map((c: { name: string }) => c.name)).toEqual(['ask', 'choice', 'noul', 'score', 'batch', 'models', 'validate', 'schema', 'describe', 'mcp']);
+    expect(data.commands.map((c: { name: string }) => c.name)).toEqual(['ask', 'choice', 'noul', 'score', 'batch', 'models', 'validate', 'schema', 'describe', 'mcp', 'auth']);
     expect(h.settings).toHaveLength(0);
     for (const name of data.schema_names) {
       const schema = await createHarness().run(['schema', name]);

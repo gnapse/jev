@@ -15,11 +15,11 @@ jev --help
 
 ## Quick start
 
-Get an API key from the [TypeSafe console](https://console.typesafe.ai) and set
-`TYPESAFE_API_KEY` in your environment:
+Get an API key from the [TypeSafe console](https://console.typesafe.ai) and save it
+once for your user account. Login prompts for the key without displaying it:
 
 ```sh
-export TYPESAFE_API_KEY='your-api-key'
+jev auth login
 
 jev choice 'Which team should handle this request?' \
   --option support --option billing --option other \
@@ -29,9 +29,15 @@ jev choice 'Which team should handle this request?' \
 The response contains `model`, `answers`, and `usage`. Convenience commands put
 their answer under `answers.result`; use `--id NAME` to choose another key.
 
-The CLI reads the key from its environment. It does not store credentials or
-load `.env` files automatically. See [local development](CONTRIBUTING.md) to
-run from a checkout with a `.env` file.
+The CLI and MCP server use the saved key across shells and working directories.
+For CI or temporary overrides, set `TYPESAFE_API_KEY` in the process environment;
+it takes priority over the saved key. `jev auth status` reports the source without
+revealing the key; `jev auth logout` removes the saved key.
+
+Credentials are stored in a private, unencrypted user file. See
+[authentication](docs/cli.md#authentication) for locations and noninteractive login.
+The CLI does not load `.env` automatically; see [local development](CONTRIBUTING.md)
+to run from a checkout with a `.env` file.
 
 ## Use in a script
 
@@ -56,7 +62,8 @@ jev score 'How much does this issue disrupt work?' \
 ```
 
 Stdout contains JSON, or JSONL for batches. Errors and diagnostics go to stderr.
-Commands never prompt. Exit 0 means the request succeeded; your script decides
+Only `jev auth login` prompts; use `--stdin` for noninteractive login.
+Exit 0 means the request succeeded; your script decides
 what the answer means and which action to take. Use `set -o pipefail` in Bash or
 Zsh pipelines to preserve upstream failures.
 
@@ -78,6 +85,7 @@ how to interpret answers.
 | `jev schema` | Print a bundled JSON Schema. |
 | `jev describe` | Print the command contract for agents and programs. |
 | `jev mcp` | Start the local MCP server over stdio. |
+| `jev auth login/status/logout` | Save, inspect the source of, or remove an API key. |
 
 Run `jev <command> --help` for flags. The [CLI reference](docs/cli.md) covers
 file input, configuration, batch results, and exit codes.
@@ -128,13 +136,14 @@ use this common configuration to run a pinned npm version:
   "mcpServers": {
     "jev": {
       "command": "npx",
-      "args": ["-y", "@gnapse/jev@0.1.0", "mcp"]
+      "args": ["-y", "@gnapse/jev@0.1.1", "mcp"]
     }
   }
 }
 ```
 
-Supply `TYPESAFE_API_KEY` through your client's environment or secret settings.
+Run `jev auth login` once on the same machine and user account, or supply
+`TYPESAFE_API_KEY` through your client's environment or secret settings.
 The server provides `jev_ask`, `jev_batch`, `jev_models`, and `jev_validate`.
 `jev_ask` supports all three question types, including mixed requests. Both
 interfaces share validation, API behavior, and complete structured results.

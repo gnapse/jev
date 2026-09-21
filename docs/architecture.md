@@ -24,11 +24,17 @@ choose process exit codes. The CLI maps core errors to exit codes; MCP maps
 them to tool errors. API response fields, including probabilities and usage,
 are preserved by both adapters.
 
+Credential storage lives in `src/cli/credentials.ts` and is injected at the
+executable entry point. CLI API calls and MCP startup resolve the environment key
+before falling back to the user credential file. Offline CLI commands skip credential
+loading. `auth login` verifies a hidden or piped key before atomically saving it;
+status and logout remain offline. The core only receives the resolved key.
+
 ## MCP interface
 
 The initial server uses stdio and the official MCP TypeScript SDK. MCP is loaded
 only for `jev mcp`. Stdout is reserved for protocol messages; diagnostics use
-stderr. The server uses its configured `TYPESAFE_API_KEY`, API endpoint, retries,
+stderr. The server uses its resolved API key, API endpoint, retries,
 and limits. Tool arguments cannot supply credentials, endpoints, headers, or
 local file paths.
 

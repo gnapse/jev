@@ -23,6 +23,9 @@ This type-checks, runs the offline tests, builds, packs, and tests a fresh npm
 installation through the CLI and real MCP clients against a local mock API.
 No TypeSafe key is needed. CI runs this
 command on Linux, macOS, and Windows with Node 22 and 24.
+Credential tests use temporary stores. Package tests set isolated config directories
+and exercise login, environment precedence, logout, and saved-key CLI/MCP calls.
+They never read or change your saved key.
 
 For focused checks, use `npm test`, `npm run type-check`, or
 `npm run test:package`.

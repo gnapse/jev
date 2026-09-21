@@ -9,7 +9,7 @@ export interface Transport {
 
 export async function createSdkTransport(settings: Settings, runtime: Runtime): Promise<Transport> {
   if (!settings.apiKey) throw new JevError({
-    code: 'AUTH_ERROR', message: 'Set TYPESAFE_API_KEY in the environment before calling the API.', retryable: false,
+    code: 'AUTH_ERROR', message: 'Run jev auth login or set TYPESAFE_API_KEY before calling the API.', retryable: false,
   });
   const sdk = await import('@typesafe-ai/sdk');
   const client = new sdk.TypeSafeClient({

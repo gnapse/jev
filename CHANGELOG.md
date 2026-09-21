@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+- `jev auth login`, `status`, and `logout` manage a user-level API key shared by CLI and MCP.
+- Hidden terminal input or explicit piped input; verify keys before saving with private file permissions.
+- Environment credentials override saved credentials. Offline CLI commands do not load the saved key.
+- Nested command discovery and JSON output schemas for authentication commands.
+
 ## 0.1.0
 
 Initial release of `@gnapse/jev`, with the `jev` CLI and MCP server.
