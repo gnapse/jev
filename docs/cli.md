@@ -66,7 +66,7 @@ fields are preserved. `--pretty` indents JSON and is unavailable for batches.
 Errors go to stderr as JSON events. For example:
 
 ```json
-{"type":"error","error":{"code":"AUTH_ERROR","message":"Set TYPESAFE_API_KEY in the environment before calling the API.","retryable":false}}
+{"type":"error","error":{"code":"AUTH_ERROR","message":"Run jev auth login or set TYPESAFE_API_KEY before calling the API.","retryable":false}}
 ```
 
 The error object contains `code`, `message`, and `retryable`. It can also contain
@@ -142,10 +142,69 @@ Each record has its own deadline and retry policy. Batch execution runs in the
 CLI process and has no resume or checkpoint storage. Retrying a failed or
 interrupted request can consume tokens again.
 
+## Authentication
+
+```sh
+jev auth login
+jev auth status
+jev auth logout
+```
+
+`login` reads a hidden terminal prompt, verifies the entered key by listing models,
+then saves it. Verification uses the entered key even if `TYPESAFE_API_KEY` is set.
+Failed verification leaves the previous saved key intact. It makes no inference
+requests. No other command prompts. Without a terminal, supply `--stdin` and pipe
+one key from a secret manager or file:
+
+```sh
+jev auth login --stdin < /path/to/api-key.txt
+```
+
+There is no API-key command-line argument. Login reserves stdin for the key;
+`--config` and `--headers-file` must name files. Login accepts the usual transport
+options, including `--base-url`, retries, and deadlines. The saved key is used
+with the API endpoint selected for each invocation.
+
+The credential source is the first nonempty value in:
+
+```text
+TYPESAFE_API_KEY > saved credentials
+```
+
+This applies to CLI API calls and `jev mcp`. Desktop agents use the same saved key
+when they run under the same user account and config directory. Remote or sandboxed
+agents with a separate home directory need their own credentials. Restart a running
+MCP server after changing credentials; it loads them at startup.
+
+The file is `~/.config/jev/credentials.json` on macOS/Linux, or
+`$XDG_CONFIG_HOME/jev/credentials.json` when `XDG_CONFIG_HOME` is an absolute path.
+On Windows it is `%APPDATA%\jev\credentials.json`, falling back to
+`%USERPROFILE%\AppData\Roaming\jev\credentials.json`.
+The file is **unencrypted**. On macOS/Linux, the directory is mode `0700` and the
+file is mode `0600`; Windows uses the user directory's inherited access controls.
+Updates replace the file atomically. Do not commit it or copy it into a project.
+
+`status` (also `jev auth`) is offline. It returns `{configured, source, path}`;
+`source` is `environment`, `file`, or `none`. It never prints the key and does not
+verify API access. Exit 0 means the status was read, even if `configured` is false.
+Run `jev models` to verify access.
+
+`login` returns `{saved: true, verified: true, source, path}`. `logout` returns
+`{removed, configured, source, path}`. Logout is idempotent and only deletes the
+local saved key. It does not revoke the key at TypeSafe or unset environment
+variables; `source: "environment"` means that override remains active.
+
+Missing credentials produce `AUTH_ERROR` (exit 3) for API calls. Corrupt, unreadable,
+or overly permissive credential files produce `IO_ERROR` (exit 7); login can replace
+them. A nonempty environment override bypasses the saved file. Offline CLI validation,
+dry runs, and discovery do not read it. Credentials never appear in command output
+or diagnostics. Only the interactive login prompt writes plain text to stderr.
+
 ## Configuration
 
-Credentials come only from `TYPESAFE_API_KEY`. The CLI does not discover config
-or `.env` files. Select a JSON config explicitly with `--config FILE`:
+Credentials follow the precedence above. Other settings are loaded only from
+explicit config files, flags, or the supported environment variables. The CLI does
+not discover project config or `.env` files. Select JSON config with `--config FILE`:
 
 ```json
 {
@@ -206,10 +265,11 @@ checks structure, not model quality or context fit. Dry-run writes the resolved
 request, including its input content. It is also available on `choice`, `noul`,
 and `score`.
 
-`describe` exposes command flags, argument names, stdin rules, environment
+`describe` exposes command flags, argument names, nested `subcommands`, stdin rules, environment
 variables, exit codes, and schema names. `schema` prints JSON Schema 2020-12;
 the same definitions are shipped in `schemas/` and used for runtime validation.
 Run `jev describe` to discover the full schema catalog.
+Use `jev describe auth` or `jev describe "auth login"` for credential commands.
 
 The CLI enforces these input boundaries:
 

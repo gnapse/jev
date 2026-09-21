@@ -9,7 +9,12 @@ export function coreRuntime(context: Context, settings: Settings): Runtime {
 }
 
 export async function getTransport(context: Context, settings: Settings): Promise<Transport> {
+  settings = await withCredentials(context, settings);
   return context.runtime.createTransport
     ? context.runtime.createTransport(settings, context)
     : createSdkTransport(settings, coreRuntime(context, settings));
+}
+
+export async function withCredentials(context: Context, settings: Settings): Promise<Settings> {
+  return settings.apiKey ? settings : { ...settings, apiKey: await context.runtime.credentials?.read() };
 }

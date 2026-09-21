@@ -3,6 +3,7 @@ import type { Settings } from './config.js';
 import type { Transport } from '../core/api.js';
 import { Writer } from './output.js';
 import { CliError } from './errors.js';
+import type { CredentialStore } from './credentials.js';
 
 export interface ContextOptions {
   env: Readonly<Record<string, string | undefined>>;
@@ -12,6 +13,7 @@ export interface ContextOptions {
   stderr: Writable;
   openFile: (path: string) => Readable;
   signal?: AbortSignal;
+  credentials?: CredentialStore;
   createTransport?: (settings: Settings, context: Context) => Promise<Transport>;
 }
 

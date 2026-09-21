@@ -18,9 +18,15 @@ CLI. Prefer CLI JSONL batches for large streams. Do not launch a new MCP process
 for each judgment; the client manages the server with `jev mcp`.
 
 The npm package is `@gnapse/jev`; the executable is `jev`. It requires Node.js
-22.12+ and `TYPESAFE_API_KEY` in the environment for API calls. The CLI does not
-load `.env` automatically or accept an API key argument. If credentials are
-missing, request environment setup rather than asking for a key in chat.
+22.12+. API calls use `TYPESAFE_API_KEY` when nonempty, otherwise the key saved by
+`jev auth login`. CLI and MCP share that user-level credential file across shells.
+Use `jev auth status` to inspect the source without exposing the key; use
+`jev models` to verify access. The CLI does not load `.env` automatically or accept
+an API key argument. If credentials are missing, ask the user to run `jev auth login`
+in their terminal or configure an environment secret, rather than provide a key in
+chat. Login alone prompts; `auth login --stdin` accepts a piped key. `auth logout`
+removes the saved key but leaves environment overrides active. Restart an MCP server
+after changing its credentials.
 
 Use these offline commands when you need the installed version's contract:
 

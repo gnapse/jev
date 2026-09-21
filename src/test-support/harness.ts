@@ -32,6 +32,7 @@ export interface HarnessOptions {
   realTransport?: boolean;
   signal?: AbortSignal;
   stdout?: Writable;
+  credentials?: ContextOptions['credentials'];
 }
 
 export function createHarness(options: HarnessOptions = {}) {
@@ -53,6 +54,7 @@ export function createHarness(options: HarnessOptions = {}) {
     stdinIsTTY: options.tty ?? false,
     stdout, stderr, signal: options.signal,
     env: options.env ?? {},
+    credentials: options.credentials,
     openFile(path) {
       if (!Object.hasOwn(options.files ?? {}, path)) throw Object.assign(new Error('Missing file'), { code: 'ENOENT' });
       return Readable.from([options.files![path]!]);

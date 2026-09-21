@@ -2,6 +2,7 @@
 import { createReadStream } from 'node:fs';
 import { runCli } from './cli/program.js';
 import { CliError } from './cli/errors.js';
+import { credentialPath, fileCredentialStore } from './cli/credentials.js';
 
 const controller = new AbortController();
 const interrupt = (name: 'SIGINT' | 'SIGTERM') => () => controller.abort(new CliError(name === 'SIGINT' ? 130 : 143,
@@ -14,6 +15,7 @@ try {
   process.exitCode = await runCli(process.argv.slice(2), {
     env: process.env, stdin: process.stdin, stdinIsTTY: process.stdin.isTTY === true,
     stdout: process.stdout, stderr: process.stderr, openFile: path => createReadStream(path), signal: controller.signal,
+    credentials: fileCredentialStore(credentialPath(process.env)),
   });
 } finally {
   process.off('SIGINT', onInt);

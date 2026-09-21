@@ -16,15 +16,19 @@ After `npm install --global @gnapse/jev`, configure your client to run command
   "mcpServers": {
     "jev": {
       "command": "npx",
-      "args": ["-y", "@gnapse/jev@0.1.0", "mcp"]
+      "args": ["-y", "@gnapse/jev@0.1.1", "mcp"]
     }
   }
 }
 ```
 
-Configuration field names depend on the client. Supply `TYPESAFE_API_KEY` through
-the client's environment or secret settings. A desktop client might not inherit
-your terminal environment. The server does not load `.env` automatically and
+Configuration field names depend on the client. Run `jev auth login` once under
+the same user account to save a key for both interfaces. The server reads it
+directly, so desktop clients do not need to inherit your terminal environment.
+Alternatively, supply `TYPESAFE_API_KEY` through the client's environment or secret
+settings; it overrides the saved key. See [authentication](cli.md#authentication)
+for file locations. Restart the MCP server after changing credentials.
+The server does not load `.env` automatically and
 never accepts an API key as a tool argument. Discovery and validation work
 without credentials. See [TypeSafe](https://console.typesafe.ai) for API keys.
 
